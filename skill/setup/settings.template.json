@@ -1,0 +1,51 @@
+{
+  "_comment": "Permissions job-hunt — mode mains-libres SCOPÉ. À fusionner dans ~/.claude/settings.json via apply-permissions.sh. La liste 'allow' = ce que l'agent peut faire sans redemander. La liste 'deny' = interdits absolus (prime sur allow), pour limiter les dégâts en cas d'injection par email.",
+  "permissions": {
+    "defaultMode": "acceptEdits",
+    "allow": [
+      "Read",
+      "Write",
+      "Edit",
+      "WebSearch",
+      "WebFetch",
+      "Bash(python3 *)",
+      "Bash(pip install *)",
+      "Bash(pip3 install *)",
+      "Bash(node *)",
+      "Bash(npm install *)",
+      "Bash(npx *)",
+      "Bash(claude mcp *)",
+      "Bash(mkdir *)",
+      "Bash(ls *)",
+      "Bash(test *)",
+      "Bash(touch ~/.claude/job-hunt.STOP)",
+      "Bash(rm ~/.claude/job-hunt.STOP)",
+      "Bash(cp *suivi_candidatures*)",
+      "mcp__gmail__search_emails",
+      "mcp__gmail__read_email",
+      "mcp__gmail__send_email",
+      "mcp__gmail__draft_email",
+      "mcp__gmail__modify_email",
+      "mcp__gmail__batch_modify_emails",
+      "mcp__gmail__list_email_labels",
+      "mcp__gmail__create_label",
+      "mcp__gmail__get_or_create_label",
+      "mcp__gmail__download_attachment",
+      "mcp__scheduled-tasks__create_scheduled_task",
+      "mcp__scheduled-tasks__list_scheduled_tasks",
+      "mcp__scheduled-tasks__update_scheduled_task"
+    ],
+    "deny": [
+      "Bash(rm -rf *)",
+      "Bash(rm -fr *)",
+      "Bash(curl *)",
+      "Bash(wget *)",
+      "Bash(ssh *)",
+      "Bash(scp *)",
+      "Bash(:(){ *)",
+      "mcp__gmail__delete_email",
+      "mcp__gmail__batch_delete_emails",
+      "mcp__gmail__delete_label"
+    ]
+  }
+}
