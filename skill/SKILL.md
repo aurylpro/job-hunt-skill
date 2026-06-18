@@ -73,6 +73,15 @@ l'étape permissions demande de relancer Claude Code au milieu du setup ; au ret
 retape `/job-hunt setup` et l'agent enchaîne directement à l'étape suivante (« On reprend : il reste
 [étapes]. »). Une seule ligne, puis on continue.
 
+### Étape 0 — Vérification des prérequis (OBLIGATOIRE, en premier)
+
+Ne suppose JAMAIS que Node.js / Python sont installés. Lis `setup/prerequisites.md` et applique-le :
+détecte l'OS, teste `node --version`, `npx --version`, `python --version`/`python3 --version`,
+`git --version`. Pour tout outil manquant, guide l'installation selon l'OS (Windows = `winget`,
+macOS = `brew` ou nodejs.org), puis demande de **fermer/rouvrir le terminal et Claude Code** (PATH),
+et re-teste. Ne continue qu'une fois tous les prérequis OK. C'est la cause n°1 de blocage débutant
+(« npx is not recognized » = Node absent ou terminal pas rouvert).
+
 ### Étape 1 — Intention (1 question)
 
 Pose exactement cette question :

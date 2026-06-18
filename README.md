@@ -24,6 +24,10 @@ cp -r job-hunt-skill/skill ~/.claude/skills/job-hunt
 | [Python 3](https://python.org) | Tracker Excel | Oui |
 | Compte Gmail | Envoi des candidatures | Oui |
 
+> Pas besoin de les installer à la main : au démarrage, l'agent **vérifie automatiquement** ton PC
+> (Windows/Mac/Linux), et si Node.js ou Python manque, il te donne la commande exacte pour l'installer
+> (ex. `winget install OpenJS.NodeJS.LTS` sur Windows) et te guide jusqu'au bout.
+
 ## Démarrage rapide
 
 1. Installe le skill (voir ci-dessus)
@@ -119,6 +123,7 @@ skill/
 │   ├── bounce.md            # Gestion des bounces + nettoyage inbox
 │   └── loop.md              # Boucle autonome 5h
 ├── setup/
+│   ├── prerequisites.md     # Vérif Node/Python/Git cross-plateforme
 │   ├── onboarding.md        # Flux d'onboarding
 │   ├── gmail-setup.md       # Guide Gmail MCP (Claude Code)
 │   ├── permissions.md       # Modes mains-libres / prudent

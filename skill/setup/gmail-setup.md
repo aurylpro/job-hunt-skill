@@ -5,14 +5,25 @@
 Le Gmail MCP permet à Claude Code de lire, envoyer et gérer les emails Gmail.
 Sans lui, l'agent ne peut pas envoyer de candidatures.
 
-## Pré-requis
+## Pré-requis — À VÉRIFIER AVANT de lancer quoi que ce soit
 
-- Un compte Gmail
-- Node.js >= 18 (vérifie avec `node --version`)
-- npm (vérifie avec `npm --version`)
+Node.js (avec npx) est indispensable ici. **Teste-le d'abord** :
 
-Si Node.js n'est pas installé, dis à l'utilisateur :
-> « Node.js n'est pas installé. Installe-le depuis https://nodejs.org (version LTS), puis relance /job-hunt setup. »
+```
+node --version
+npx --version
+```
+
+Si l'une renvoie « not recognized » (Windows) ou « command not found » (Mac/Linux) → Node.js
+n'est pas installé (ou le terminal n'a pas été rouvert après installation). NE LANCE PAS la
+commande `npx ...auth` tant que ce n'est pas réglé — elle échouera avec « npx is not recognized ».
+
+Va d'abord régler ça via `setup/prerequisites.md` :
+- **Windows** : `winget install OpenJS.NodeJS.LTS` (ou installeur LTS https://nodejs.org)
+- **macOS** : `brew install node` (ou https://nodejs.org)
+- Puis **fermer et rouvrir le terminal + Claude Code**, et re-tester `node --version`.
+
+Quand `node --version` et `npx --version` répondent un numéro → continue ci-dessous.
 
 ## Installation — serveur recommandé
 

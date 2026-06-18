@@ -10,6 +10,16 @@ reprend où ça s'est arrêté, sans reposer une question déjà répondue. Util
 (1 bis) impose de relancer Claude Code : au retour, l'utilisateur retape `/job-hunt setup` et l'agent
 enchaîne à l'étape suivante en une ligne (« On reprend : il reste X, Y, Z. »).
 
+## Étape 0 — Prérequis (en premier, obligatoire)
+
+Avant toute question, vérifie l'environnement de l'utilisateur. Ne suppose rien d'installé.
+Applique `setup/prerequisites.md` : détecte l'OS, teste Node.js / npx / Python / Git, guide
+l'installation de ce qui manque selon l'OS, fais **rouvrir le terminal + Claude Code** après
+installation (PATH), puis re-teste. On ne continue que quand tout est vert.
+
+Présente le résultat simplement : « Vérif PC : Node ✅ Python ✅ — on continue » ou « Il manque
+Node.js, installe-le avec [commande], rouvre le terminal, et redis-moi « c'est bon ». »
+
 ## Étape 1 — Profil
 
 **Question exacte :**
