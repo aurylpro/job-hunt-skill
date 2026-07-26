@@ -2,6 +2,10 @@
 
 Agent autonome de recherche d'emploi pour Claude Code. Gère le cycle complet : prospection, candidatures personnalisées, envoi via Gmail, vérification de livraison, relances automatiques et suivi structuré.
 
+> **Tu utilises Google Antigravity ?** Une version portée du skill (AGENTS.md + rules + skills +
+> workflows + config MCP Gmail) est disponible dans [`antigravity/`](antigravity/README.md),
+> avec le guide d'installation pas à pas.
+
 ## Installation
 
 ```bash
