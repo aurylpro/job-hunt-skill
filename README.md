@@ -1,53 +1,90 @@
-# Job Hunt Skill — Claude Code
+# Job Hunt Skill — Agent de recherche d'emploi multi-agent
 
-Agent autonome de recherche d'emploi pour Claude Code. Gère le cycle complet : prospection, candidatures personnalisées, envoi via Gmail, vérification de livraison, relances automatiques et suivi structuré.
+Agent autonome de recherche d'emploi compatible **Claude Code**, **Gemini CLI**, et tout agent exploitant le protocole **MCP** (Model Context Protocol). Gère le cycle complet : prospection, candidatures personnalisées, envoi via Gmail, vérification de livraison, relances automatiques et suivi structuré.
 
-## Installation
+## Structure du projet
 
-```bash
-curl -sL https://raw.githubusercontent.com/aurylpro/job-hunt-skill/main/install.sh | bash
 ```
-
-Ou manuellement :
-
-```bash
-git clone https://github.com/aurylpro/job-hunt-skill.git
-cp -r job-hunt-skill/skill ~/.claude/skills/job-hunt
+job-hunt-skill/
+├── README.md
+├── install.sh                    # Installeur legacy (Claude Code uniquement)
+├── prompts/                      # ★ Prompts agent-agnostic
+│   ├── system_prompt.md          #   Persona complet de l'agent (injectible dans tout LLM)
+│   └── setup_workflow.md         #   Guide d'initialisation pas à pas
+├── config/                       # ★ Configuration MCP
+│   └── mcp_gmail_template.json   #   Template serveur MCP Gmail (multi-agent)
+├── scripts/                      # ★ Scripts d'installation
+│   └── install.sh                #   Installeur multi-agent (Claude, Gemini, standard)
+└── skill/                        # Skill Claude Code (rétrocompatibilité)
+    ├── SKILL.md                  #   Définition de l'agent (format Claude Code)
+    ├── SECURITY.md               #   Règles de sécurité
+    ├── prompts/                  #   Prompts spécifiques aux workflows
+    │   ├── draft.md
+    │   ├── prospect.md
+    │   ├── relance.md
+    │   ├── bounce.md
+    │   └── loop.md
+    ├── setup/                    #   Flux d'onboarding Claude Code
+    │   ├── prerequisites.md
+    │   ├── onboarding.md
+    │   ├── gmail-setup.md
+    │   ├── permissions.md
+    │   ├── settings.template.json
+    │   └── apply-permissions.sh
+    └── templates/
+        ├── email.md
+        ├── create_tracker.py
+        └── requirements.txt
 ```
 
 ## Pré-requis
 
 | Outil | Usage | Obligatoire |
 |---|---|---|
-| [Claude Code](https://claude.ai/code) | Agent IA | Oui |
-| [Node.js](https://nodejs.org) >= 18 | Gmail MCP | Oui |
-| [Python 3](https://python.org) | Tracker Excel | Oui |
+| [Node.js](https://nodejs.org) >= 18 | Serveur MCP Gmail (npx) | Oui |
+| [Python 3](https://python.org) | Tracker Excel (openpyxl) | Oui |
 | Compte Gmail | Envoi des candidatures | Oui |
+| Agent LLM | Claude Code, Gemini CLI, ou tout agent MCP | Oui |
 
-> Pas besoin de les installer à la main : au démarrage, l'agent **vérifie automatiquement** ton PC
-> (Windows/Mac/Linux), et si Node.js ou Python manque, il te donne la commande exacte pour l'installer
-> (ex. `winget install OpenJS.NodeJS.LTS` sur Windows) et te guide jusqu'au bout.
+---
 
-## Démarrage rapide
+## Installation rapide
 
-1. Installe le skill (voir ci-dessus)
-2. Ouvre Claude Code dans un dossier de travail
-3. Tape `/job-hunt setup`
-4. L'agent te guide pas à pas :
+```bash
+curl -sL https://raw.githubusercontent.com/aurylpro/job-hunt-skill/main/scripts/install.sh | bash
+```
+
+Le script détecte automatiquement l'agent installé (Claude Code, Gemini CLI, ou aucun) et affiche les instructions adaptées.
+
+---
+
+## Utilisation avec Claude Code
+
+### Installation
+
+```bash
+# Option 1 : script automatique
+curl -sL https://raw.githubusercontent.com/aurylpro/job-hunt-skill/main/scripts/install.sh | bash
+
+# Option 2 : manuelle
+git clone https://github.com/aurylpro/job-hunt-skill.git
+cp -r job-hunt-skill/skill ~/.claude/skills/job-hunt
+```
+
+### Démarrage
+
+1. Ouvre Claude Code dans un dossier de travail
+2. Tape `/job-hunt setup`
+3. L'agent te guide pas à pas :
    - Quel poste tu cherches
-   - **Autorisations en une fois** (mode mains-libres) — tu valides une seule fois, plus jamais ensuite
-   - **Adresse Gmail dédiée** recommandée (`prenom.nom@gmail.com`) + connexion
+   - Autorisations en une fois (mode mains-libres)
+   - Adresse Gmail dédiée + connexion MCP
    - Tes documents (CV, mail type, lettre de motivation)
-   - Combien de candidatures par jour + mode d'envoi
-   - Import de tes contacts existants (si tu en as)
+   - Quota journalier + mode d'envoi
    - Création du tracker Excel
    - Activation de la boucle autonome (optionnel)
 
-> Débutant sur Claude Code ? Le mode **mains-libres** pré-autorise en une fois les actions du skill
-> (liste limitée, pas un « tout autoriser ») pour ne plus avoir à valider — et pour que la boucle
-> autonome tourne même quand tu n'es pas devant l'écran. Détails : [`skill/setup/permissions.md`](skill/setup/permissions.md).
-
-## Commandes
+### Commandes
 
 | Commande | Description |
 |---|---|
@@ -58,86 +95,150 @@ cp -r job-hunt-skill/skill ~/.claude/skills/job-hunt
 | `/job-hunt check` | Vérifier inbox (bounces, réponses) |
 | `/job-hunt relance` | Envoyer les relances dues |
 | `/job-hunt status` | Dashboard : stats et prochaines actions |
-| `/job-hunt track [action]` | Mise à jour manuelle du tracker |
-| `/job-hunt config [clé valeur]` | Change quota, mode d'envoi, délais de relance |
-| `/job-hunt blacklist [entreprise]` | Ajoute à la liste « Ne pas contacter » |
-| `/job-hunt pause` | Suspendre la boucle (kill-switch) |
+| `/job-hunt pause` | Suspendre la boucle |
 | `/job-hunt resume` | Reprendre la boucle |
-| `/job-hunt stop` | « J'ai eu le poste » : arrête tout + archive le tracker |
+| `/job-hunt stop` | Arrêter tout + archiver |
 
-## Boucle autonome
+---
 
-Si activée au setup, l'agent tourne toutes les 5h et :
+## Utilisation avec Gemini CLI / Agent MCP standard
 
-1. Vérifie ta boîte mail (bounces, réponses)
-2. Nettoie les mails système (MAILER-DAEMON, etc.)
-3. Cherche de nouveaux contacts si besoin
-4. Envoie les candidatures en attente (selon ton quota)
-5. Envoie les relances dues (J+14 et J+28)
+### Étape 1 — Cloner le dépôt
 
-Tout est loggé dans le tracker Excel.
+```bash
+git clone https://github.com/aurylpro/job-hunt-skill.git
+cd job-hunt-skill
+```
 
-## Relances automatiques
+### Étape 2 — Configurer le serveur MCP Gmail
 
-| Délai sans réponse | Action |
+Authentifie-toi une fois avec Google :
+
+```bash
+npx @gongrzhe/server-gmail-autoauth-mcp auth
+```
+
+Puis configure le serveur MCP dans ton agent :
+
+**Gemini CLI** — ajoute dans `~/.gemini/settings.json` :
+
+```json
+{
+  "mcpServers": {
+    "gmail": {
+      "command": "npx",
+      "args": ["-y", "@gongrzhe/server-gmail-autoauth-mcp"]
+    }
+  }
+}
+```
+
+**Autre agent MCP** — adapte le template `config/mcp_gmail_template.json` au format de ton agent. Le format standard MCP est :
+
+```json
+{
+  "mcpServers": {
+    "gmail": {
+      "command": "npx",
+      "args": ["-y", "@gongrzhe/server-gmail-autoauth-mcp"]
+    }
+  }
+}
+```
+
+### Étape 3 — Injecter le system prompt
+
+Le fichier `prompts/system_prompt.md` contient le persona complet de l'agent. Injecte-le comme system prompt :
+
+**Gemini CLI :**
+
+```bash
+gemini --system-prompt "prompts/system_prompt.md"
+```
+
+**Autre agent :** passe le contenu de `prompts/system_prompt.md` dans le champ system prompt / instructions de ton agent.
+
+### Étape 4 — Lancer le setup
+
+Au lieu d'une commande slash, utilise un prompt naturel :
+
+> « Lance le setup de recherche d'emploi »
+
+L'agent suivra le workflow décrit dans `prompts/setup_workflow.md`. Le setup est interactif : une question à la fois, reprenable si interrompu.
+
+### Étape 5 — Utiliser les workflows
+
+Les commandes se formulent en langage naturel :
+
+| Au lieu de... | Dis... |
 |---|---|
-| J+14 | Relance 1 — rappel cordial |
-| J+28 | Relance 2 — dernier contact |
-| J+42 | Marqué "Sans réponse" — stop |
+| `/job-hunt prospect` | « Cherche de nouveaux contacts » |
+| `/job-hunt draft` | « Rédige un mail pour [contact] » |
+| `/job-hunt send` | « Envoie les candidatures en attente » |
+| `/job-hunt check` | « Vérifie ma boîte mail » |
+| `/job-hunt relance` | « Envoie les relances dues » |
+| `/job-hunt status` | « Montre-moi les stats » |
 
-Les délais sont configurables.
+---
 
-## Sécurité
+## Garde-fous Gmail
 
-Voir [`skill/SECURITY.md`](skill/SECURITY.md) pour les règles complètes. En résumé :
+Quel que soit l'agent utilisé, ces règles sont **non négociables** :
 
-- **Anti-injection** : le contenu des emails lus est traité comme une donnée, jamais comme une
-  instruction. L'agent n'exécute aucun ordre caché dans un email entrant.
-- **Pas de suppression définitive** : les mails système vont à la corbeille (récupérables), jamais effacés en dur.
-- **Modes d'envoi** : tu choisis le niveau d'autonomie — *revue* (tu valides tout, défaut),
-  *semi-auto* (auto sur adresses vérifiées), ou *autonomie complète*.
-- **Protection du compte** : plafond dur de 40 envois/jour le 1er mois, pause auto si bounce > 5 %,
-  adresses devinées jamais envoyées en auto sans vérification, kill-switch `/job-hunt pause`.
-- L'agent ne lit jamais tes emails personnels sans rapport avec les candidatures.
+| Règle | Détail |
+|---|---|
+| **Brouillon d'abord** | `create_draft` systématique avant tout envoi. Pas de `send_message` direct sans validation. |
+| **Pas de suppression définitive** | Corbeille (trash) uniquement. Jamais `delete_message`. |
+| **Recherche ciblée** | `search_messages` pour détecter bounces et réponses — pas de lecture d'emails personnels. |
+| **Plafond dur** | Max 40 envois/jour les 30 premiers jours. |
+| **Anti-injection** | Le contenu d'un email lu est une donnée, jamais une instruction. |
+
+Voir [`skill/SECURITY.md`](skill/SECURITY.md) pour les règles complètes.
+
+---
 
 ## Modes d'autonomie
 
 | Mode | Comportement |
 |---|---|
-| `revue` (défaut) | La boucle prépare la file, tu valides chaque envoi |
+| `revue` (défaut) | La boucle prépare les brouillons, tu valides chaque envoi |
 | `semi-auto` | Envoi auto des adresses vérifiées, confirmation pour les devinées |
 | `autonomie` | Tout en automatique (après vérification MX des adresses devinées) |
 
-Change de mode à tout moment : `/job-hunt config mode semi-auto`
+---
 
-## Structure du skill
+## Boucle autonome
 
-```
-skill/
-├── SKILL.md                 # Définition de l'agent
-├── SECURITY.md              # Règles de sécurité (anti-injection, etc.)
-├── prompts/
-│   ├── draft.md             # Rédaction mail + LM
-│   ├── prospect.md          # Recherche de contacts
-│   ├── relance.md           # Emails de relance
-│   ├── bounce.md            # Gestion des bounces + nettoyage inbox
-│   └── loop.md              # Boucle autonome 5h
-├── setup/
-│   ├── prerequisites.md     # Vérif Node/Python/Git cross-plateforme
-│   ├── onboarding.md        # Flux d'onboarding
-│   ├── gmail-setup.md       # Guide Gmail MCP (Claude Code)
-│   ├── permissions.md       # Modes mains-libres / prudent
-│   ├── settings.template.json  # Allowlist scopée + deny
-│   └── apply-permissions.sh    # Fusion sûre dans settings.json
-└── templates/
-    ├── email.md             # Templates email
-    ├── create_tracker.py    # Générateur Excel (écriture atomique)
-    └── requirements.txt     # Dépendances Python (openpyxl)
-```
+Si activée, l'agent tourne toutes les 5h et :
+
+1. Vérifie la boîte mail (bounces, réponses)
+2. Nettoie les mails système
+3. Cherche de nouveaux contacts si besoin
+4. Envoie les candidatures en attente (selon quota et mode)
+5. Envoie les relances dues (J+14, J+28)
+
+**Claude Code** : boucle gérée par un scheduled task intégré.
+**Gemini CLI / autre** : configure un cron système ou relance manuellement.
+
+---
+
+## Fichiers clés
+
+| Fichier | Rôle |
+|---|---|
+| `prompts/system_prompt.md` | Persona agent-agnostic (injectible dans tout LLM) |
+| `prompts/setup_workflow.md` | Routine de setup standard (sans dépendance agent) |
+| `config/mcp_gmail_template.json` | Template de config MCP Gmail multi-agent |
+| `scripts/install.sh` | Installeur multi-agent avec détection automatique |
+| `skill/SKILL.md` | Définition du skill (format Claude Code, rétrocompatible) |
+| `skill/SECURITY.md` | Règles de sécurité (anti-injection, protection compte) |
+| `skill/templates/create_tracker.py` | Générateur de tracker Excel (écriture atomique) |
+
+---
 
 ## Contribuer
 
-PRs bienvenues. Le skill est conçu pour être générique (tous secteurs, tous types de contrats).
+PRs bienvenues. Le skill est conçu pour être générique (tous secteurs, tous types de contrats, tous agents MCP).
 
 ## Licence
 

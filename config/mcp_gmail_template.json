@@ -1,0 +1,101 @@
+{
+  "_comment": "Template de configuration MCP Gmail pour agents compatibles MCP (Gemini CLI, Claude Code, etc.). Adaptez les chemins et identifiants selon votre environnement.",
+
+  "server_name": "gmail",
+  "description": "Serveur MCP Gmail — lecture, envoi et gestion des emails pour la recherche d'emploi",
+
+  "recommended_server": {
+    "package": "@gongrzhe/server-gmail-autoauth-mcp",
+    "repository": "https://github.com/GongRzhe/Gmail-MCP-Server",
+    "note": "Vérifie toujours le dépôt avant installation. Si le paquet a changé, cherche 'Gmail MCP server' et choisis un dépôt actif."
+  },
+
+  "claude_code": {
+    "_comment": "Configuration pour Claude Code (CLI)",
+    "auth_command": "npx @gongrzhe/server-gmail-autoauth-mcp auth",
+    "add_command": "claude mcp add gmail -- npx -y @gongrzhe/server-gmail-autoauth-mcp",
+    "add_command_global": "claude mcp add --scope user gmail -- npx -y @gongrzhe/server-gmail-autoauth-mcp",
+    "verify_command": "claude mcp list"
+  },
+
+  "gemini_cli": {
+    "_comment": "Configuration pour Gemini CLI — à placer dans le fichier de config MCP de Gemini",
+    "settings_file": "~/.gemini/settings.json",
+    "mcp_servers_entry": {
+      "gmail": {
+        "command": "npx",
+        "args": ["-y", "@gongrzhe/server-gmail-autoauth-mcp"],
+        "env": {}
+      }
+    }
+  },
+
+  "standard_mcp": {
+    "_comment": "Format standard MCP (compatible avec tout client MCP)",
+    "mcpServers": {
+      "gmail": {
+        "command": "npx",
+        "args": ["-y", "@gongrzhe/server-gmail-autoauth-mcp"],
+        "env": {}
+      }
+    }
+  },
+
+  "oauth_credentials": {
+    "_comment": "Si le serveur MCP Gmail nécessite des identifiants OAuth Google (certaines versions)",
+    "required_variables": {
+      "GOOGLE_CLIENT_ID": "Ton Client ID OAuth2 (Google Cloud Console > APIs & Services > Credentials)",
+      "GOOGLE_CLIENT_SECRET": "Ton Client Secret OAuth2",
+      "GOOGLE_APPLICATION_CREDENTIALS": "(Optionnel) Chemin vers le fichier credentials.json téléchargé depuis Google Cloud Console"
+    },
+    "setup_steps": [
+      "1. Va sur https://console.cloud.google.com/apis/credentials",
+      "2. Crée un projet (ou utilise un existant)",
+      "3. Active l'API Gmail (APIs & Services > Library > Gmail API > Enable)",
+      "4. Crée des identifiants OAuth 2.0 (Create Credentials > OAuth client ID > Desktop app)",
+      "5. Télécharge le fichier credentials.json",
+      "6. Place-le dans ~/.gmail-mcp/credentials.json ou définis GOOGLE_APPLICATION_CREDENTIALS"
+    ]
+  },
+
+  "tools_used_by_agent": {
+    "_comment": "Outils MCP Gmail utilisés par l'agent job-hunt. Les noms exacts peuvent varier selon le serveur MCP.",
+    "required": [
+      {
+        "tool": "search_messages / search_emails / search_threads",
+        "usage": "Rechercher les bounces, réponses de recruteurs, confirmations"
+      },
+      {
+        "tool": "create_draft / draft_email",
+        "usage": "Créer un brouillon de candidature (TOUJOURS avant envoi)"
+      },
+      {
+        "tool": "send_message / send_email",
+        "usage": "Envoyer UNIQUEMENT après validation explicite de l'utilisateur"
+      },
+      {
+        "tool": "read_message / read_email / get_message",
+        "usage": "Lire le contenu d'un email (bounce, réponse)"
+      },
+      {
+        "tool": "modify_message / modify_email / label_message",
+        "usage": "Appliquer un label ou mettre à la corbeille"
+      },
+      {
+        "tool": "create_label",
+        "usage": "Créer le label 'job-hunt/traité'"
+      }
+    ],
+    "forbidden": [
+      {
+        "tool": "delete_message / delete_email / batch_delete",
+        "reason": "Suppression définitive interdite — toujours utiliser la corbeille (trash)"
+      }
+    ]
+  },
+
+  "prerequisites": {
+    "node_js": ">= 18 (pour npx)",
+    "verify": "node --version && npx --version"
+  }
+}

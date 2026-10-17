@@ -1,3 +1,7 @@
 skill/templates/__pycache__/
+__pycache__/
 *.pyc
 ~$*.xlsx
+node_modules/
+.gmail-mcp/
+credentials.json
